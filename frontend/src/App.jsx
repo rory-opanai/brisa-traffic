@@ -55,6 +55,7 @@ function Intersection({ title, durations, position }) {
 
 export default function App() {
   const [timings, setTimings] = useState(BASELINE)
+  const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:4000'
 
   // Subscribe to backend updates via SSE, with initial fetch fallback
   useEffect(() => {
@@ -63,7 +64,7 @@ export default function App() {
 
     const fetchInitial = async () => {
       try {
-        const res = await fetch('http://localhost:4000/api/signals', { signal: controller.signal })
+        const res = await fetch(`${API_BASE}/api/signals`, { signal: controller.signal })
         if (res.ok) {
           const data = await res.json()
           setTimings((t) => ({ ...t, ...data }))
@@ -74,7 +75,7 @@ export default function App() {
     fetchInitial()
 
     try {
-      es = new EventSource('http://localhost:4000/api/signals/stream')
+      es = new EventSource(`${API_BASE}/api/signals/stream`)
       es.onmessage = (evt) => {
         try {
           const data = JSON.parse(evt.data)
@@ -87,7 +88,7 @@ export default function App() {
       controller.abort()
       if (es && es.close) es.close()
     }
-  }, [])
+  }, [API_BASE])
 
   return (
     <div className="min-h-screen">
