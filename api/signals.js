@@ -32,13 +32,10 @@ async function getKV(env) {
       return data?.result ?? null
     },
     async set(key, value) {
-      await fetch(`${url}/set/${encodeURIComponent(key)}`, {
+      // Upstash REST: POST /set/{key}/{value}
+      await fetch(`${url}/set/${encodeURIComponent(key)}/${encodeURIComponent(value)}`, {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ value }),
+        headers: { Authorization: `Bearer ${token}` },
       })
     },
   }
