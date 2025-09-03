@@ -55,7 +55,9 @@ function Intersection({ title, durations, position }) {
 
 export default function App() {
   const [timings, setTimings] = useState(BASELINE)
-  const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:4000'
+  // In Vercel (production), leave empty to use same-origin /api
+  // In local dev, set VITE_API_BASE=http://localhost:4000 to use Express backend
+  const API_BASE = (import.meta.env.VITE_API_BASE ?? '').trim()
 
   // Subscribe to backend updates via SSE, with initial fetch fallback
   useEffect(() => {
@@ -64,7 +66,8 @@ export default function App() {
 
     const fetchInitial = async () => {
       try {
-        const res = await fetch(`${API_BASE}/api/signals`, { signal: controller.signal })
+        const url = API_BASE ? `${API_BASE}/api/signals` : `/api/signals`
+        const res = await fetch(url, { signal: controller.signal })
         if (res.ok) {
           const data = await res.json()
           setTimings((t) => ({ ...t, ...data }))
@@ -75,7 +78,8 @@ export default function App() {
     fetchInitial()
 
     try {
-      es = new EventSource(`${API_BASE}/api/signals/stream`)
+      const streamUrl = API_BASE ? `${API_BASE}/api/signals/stream` : `/api/signals/stream`
+      es = new EventSource(streamUrl)
       es.onmessage = (evt) => {
         try {
           const data = JSON.parse(evt.data)

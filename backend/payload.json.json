@@ -1,0 +1,1 @@
+curl -X POST https://brisa-traffic.vercel.app/api/signals -H "Content-Type: application/json" -d '{"stadiumExit":{"green","red"},"mainline":{"green","red"},"northGate":{"green","red"},"southGate":{"green","red"},"eastGate":{"green","red"},"westGate":{"green","red"},"perimeterNW":{"green","red"},"perimeterSE":{"green","red"}}'
