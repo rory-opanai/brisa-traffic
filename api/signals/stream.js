@@ -5,8 +5,8 @@ const KV_KEY = 'signals:current'
 
 async function getKV(env) {
   if (env && env.KV) return env.KV
-  const url = env?.KV_REST_API_URL
-  const token = env?.KV_REST_API_TOKEN
+  const url = env?.UPSTASH_REDIS_REST_URL || env?.KV_REST_API_URL
+  const token = env?.UPSTASH_REDIS_REST_TOKEN || env?.KV_REST_API_TOKEN
   if (!url || !token) return null
   return {
     async get(key) {
@@ -67,4 +67,3 @@ export default async function handler(req) {
     },
   })
 }
-

@@ -17,9 +17,9 @@ const KV_KEY = 'signals:current'
 async function getKV(env) {
   // Prefer native Vercel KV binding if present at env.KV
   if (env && env.KV) return env.KV
-  // Fallback to REST API using env vars KV_REST_API_URL and KV_REST_API_TOKEN
-  const url = env?.KV_REST_API_URL
-  const token = env?.KV_REST_API_TOKEN
+  // Support Upstash Redis on Vercel Marketplace (preferred)
+  const url = env?.UPSTASH_REDIS_REST_URL || env?.KV_REST_API_URL
+  const token = env?.UPSTASH_REDIS_REST_TOKEN || env?.KV_REST_API_TOKEN
   if (!url || !token) return null
   return {
     async get(key) {
@@ -72,7 +72,7 @@ export default async function handler(req) {
       const current = await readTimings(process.env)
       const merged = { ...current, ...incoming }
       await writeTimings(process.env, merged)
-      return new Response(JSON.stringify({ ok: true }), {
+      return new Response(JSON.stringify({ ok: true, timings: merged }), {
         headers: { 'Content-Type': 'application/json' },
       })
     } catch (e) {
@@ -81,4 +81,3 @@ export default async function handler(req) {
   }
   return new Response('Method Not Allowed', { status: 405 })
 }
-
